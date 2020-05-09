@@ -7,11 +7,12 @@ def apply_coupons(cart, coupons)
     next if (not item_info) || coupon[:num] > item_info[:count]
     item_info[:count] -= coupon[:num]
     
-    new_item = {}
-    new_item[:item] = item_info[:item] + " W/COUPON"
-    new_item[:price] = coupon[:cost]/coupon[:num]
-    new_item[:clearance] = item_info[:clearance]
-    new_item[:count] = coupon[:num]
+    new_item = {
+      item: item_info[:item] + " W/COUPON",
+      price: coupon[:cost]/coupon[:num],
+      clearance: item_info[:clearance],
+      count: coupon[:num]
+    }
     cart.push(new_item)
   end 
   cart
@@ -28,11 +29,7 @@ def checkout(cart, coupons)
   coupon_cart = apply_coupons(org_cart, coupons)
   apply_clearance(coupon_cart)
   
-  total = 0
-  for item in coupon_cart do
-    total += item[:count] * item[:price]
-  end 
-  
+  total = coupon_cart.reduce(0) {|total, item| total += item[:count] * item[:price]}
   total *= 0.9 if total > 100
   return total.round(2)
 end
